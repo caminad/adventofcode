@@ -1,4 +1,4 @@
-type Bit = 0 | 1;
+export type Bit = 0 | 1;
 
 export function parseDiagnostics(input: string): Bit[][] {
   return input.match(/[01]+/g)!.map((row) =>
@@ -6,15 +6,15 @@ export function parseDiagnostics(input: string): Bit[][] {
   );
 }
 
-export function getHighBitCols(rows: Bit[][]): Bit[] {
-  return Array.from(rows[0], (_, index) => {
-    const col = rows.map((row) => row[index]);
-    return col.filter(Boolean).length > (rows.length / 2) ? 1 : 0;
+export function countColBits(
+  rows: Bit[][],
+  index: number,
+): Record<Bit, number> {
+  const counts = { 0: 0, 1: 0 };
+  rows.map((row) => row[index]).forEach((bit) => {
+    counts[bit]++;
   });
-}
-
-export function invertBits(bits: Bit[]): Bit[] {
-  return bits.map((bit) => bit ? 0 : 1);
+  return counts;
 }
 
 export function bitsToNumber(bits: Bit[]): number {
@@ -25,13 +25,51 @@ export function bitsToNumber(bits: Bit[]): number {
   return value;
 }
 
-export function getRates(diagnostics: Bit[][]): {
-  gamma: number;
-  epsilon: number;
-} {
-  const bits = getHighBitCols(diagnostics);
-  return {
-    gamma: bitsToNumber(bits),
-    epsilon: bitsToNumber(invertBits(bits)),
-  };
+export function getGammaRate(diagnostics: Bit[][]): number {
+  const bits = Array.from(diagnostics[0].keys(), (index) => {
+    const counts = countColBits(diagnostics, index);
+    return counts[1] > counts[0] ? 1 : 0;
+  });
+  return bitsToNumber(bits);
+}
+
+export function getEpsilonRate(diagnostics: Bit[][]): number {
+  const bits = Array.from(diagnostics[0].keys(), (index) => {
+    const counts = countColBits(diagnostics, index);
+    return counts[1] > counts[0] ? 0 : 1;
+  });
+  return bitsToNumber(bits);
+}
+
+export function getPowerConsumption(diagnostics: Bit[][]): number {
+  return getGammaRate(diagnostics) * getEpsilonRate(diagnostics);
+}
+
+export function findOxygenGeneratorRating(diagnostics: Bit[][]): number {
+  for (const index of diagnostics[0].keys()) {
+    const counts = countColBits(diagnostics, index);
+    const bit = counts[1] >= counts[0] ? 1 : 0;
+    diagnostics = diagnostics.filter((row) => row[index] === bit);
+    if (diagnostics.length === 1) {
+      return bitsToNumber(diagnostics[0]);
+    }
+  }
+  return NaN;
+}
+
+export function findCO2ScrubberRating(diagnostics: Bit[][]): number {
+  for (const index of diagnostics[0].keys()) {
+    const counts = countColBits(diagnostics, index);
+    const bit = counts[1] >= counts[0] ? 0 : 1;
+    diagnostics = diagnostics.filter((row) => row[index] === bit);
+    if (diagnostics.length === 1) {
+      return bitsToNumber(diagnostics[0]);
+    }
+  }
+  return NaN;
+}
+
+export function getLifeSupportRating(diagnostics: Bit[][]): number {
+  return findOxygenGeneratorRating(diagnostics) *
+    findCO2ScrubberRating(diagnostics);
 }
