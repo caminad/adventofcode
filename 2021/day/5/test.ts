@@ -61,7 +61,7 @@ Deno.test("parseInput", () => {
 });
 
 Deno.test("DensityMap", () => {
-  assertEquals(new DensityMap().toString(), ".");
+  assertEquals(new DensityMap().toString(), "");
 });
 
 Deno.test("DensityMap.prototype.inc", () => {
@@ -99,33 +99,21 @@ Deno.test("DensityMap.create (complex)", () => {
   assertEquals(map.toString(), exampleComplexDisplayOutput);
 });
 
-Deno.test("DensityMap.prototype.@@iterator", () => {
+Deno.test("DensityMap.prototype.crossings", () => {
   const filtered = exampleParsedInput.filter((l) =>
     l[0].x === l[1].x || l[0].y === l[1].y
   );
-  assertEquals(
-    [...DensityMap.create(...filtered)].filter((n) => n > 1).length,
-    5,
-  );
-  assertEquals(
-    [...DensityMap.create(...exampleParsedInput)].filter((n) => n > 1).length,
-    12,
-  );
+  assertEquals(DensityMap.create(...filtered).crossings, 5);
+  assertEquals(DensityMap.create(...exampleParsedInput).crossings, 12);
 });
 
 Deno.test("part 1", () => {
   const filtered = [...parseInput(input)].filter((l) =>
     l[0].x === l[1].x || l[0].y === l[1].y
   );
-  assertEquals(
-    [...DensityMap.create(...filtered)].filter((n) => n > 1).length,
-    5690,
-  );
+  assertEquals(DensityMap.create(...filtered).crossings, 5690);
 });
 
 Deno.test("part 2", () => {
-  assertEquals(
-    [...DensityMap.create(...parseInput(input))].filter((n) => n > 1).length,
-    17741,
-  );
+  assertEquals(DensityMap.create(...parseInput(input)).crossings, 17741);
 });

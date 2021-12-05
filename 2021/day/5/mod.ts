@@ -13,8 +13,11 @@ export function* parseInput(input: string): IterableIterator<Line> {
   }
 }
 
-export class DensityMap implements Iterable<number> {
-  readonly #rows: number[][] = [[0]];
+export class DensityMap {
+  readonly #rows: Map<number, Map<number, number>> = new Map();
+  #width = 0;
+  #height = 0;
+  #crossings = 0;
 
   static create(...lines: Line[]): DensityMap {
     const map = new DensityMap();
@@ -25,39 +28,49 @@ export class DensityMap implements Iterable<number> {
   }
 
   inc(x: number, y: number): this {
-    while (this.#rows.length <= y) {
-      this.#rows.push(Array.from(this.#rows[0]).fill(0));
+    let row = this.#rows.get(y);
+    if (!row) {
+      row = new Map<number, number>();
+      this.#rows.set(y, row);
     }
-    while (this.#rows[0].length <= x) {
-      this.#rows.forEach((row) => row.push(0));
-    }
-    this.#rows[y][x]++;
+    const count = (row.get(x) ?? 0) + 1;
+    row.set(x, count);
+    if (x >= this.#width) this.#width = x + 1;
+    if (y >= this.#height) this.#height = y + 1;
+    if (count === 2) this.#crossings++;
     return this;
   }
 
   plot(start: Coords, end: Coords): this {
-    const slope = (end.y - start.y) / (end.x - start.x);
-    const intercept = start.y - slope * start.x;
     const min = { x: Math.min(start.x, end.x), y: Math.min(start.y, end.y) };
     const max = { x: Math.max(start.x, end.x), y: Math.max(start.y, end.y) };
-    for (let x = min.x; x <= max.x; x++) {
+    if (start.y === end.y) {
+      for (let x = min.x; x <= max.x; x++) {
+        this.inc(x, start.y);
+      }
+    } else if (start.x === end.x) {
       for (let y = min.y; y <= max.y; y++) {
-        if (!Number.isFinite(slope) || y === slope * x + intercept) {
-          this.inc(x, y);
-        }
+        this.inc(start.x, y);
+      }
+    } else {
+      const slope = (end.y - start.y) / (end.x - start.x);
+      const intercept = start.y - slope * start.x;
+      for (let x = min.x; x <= max.x; x++) {
+        this.inc(x, slope * x + intercept);
       }
     }
     return this;
   }
 
   toString() {
-    const lines = this.#rows.map((row) => row.map((n) => n || "."));
-    return lines.map((line) => line.join("")).join("\n");
+    return Array.from({ length: this.#height }, (_, y) => {
+      return Array.from({ length: this.#width }, (_, x) => {
+        return this.#rows.get(y)?.get(x) ?? ".";
+      }).join("");
+    }).join("\n");
   }
 
-  *[Symbol.iterator]() {
-    for (const row of this.#rows) {
-      yield* row;
-    }
+  get crossings() {
+    return this.#crossings;
   }
 }
