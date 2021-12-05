@@ -63,11 +63,19 @@ export class DensityMap {
   }
 
   toString() {
-    return Array.from({ length: this.#height }, (_, y) => {
-      return Array.from({ length: this.#width }, (_, x) => {
-        return this.#rows.get(y)?.get(x) ?? ".";
-      }).join("");
-    }).join("\n");
+    let result = "";
+    for (let y = 0; y < this.#height; y++) {
+      if (result) result += "\n";
+      const row = this.#rows.get(y);
+      if (row) {
+        for (let x = 0; x < this.#width; x++) {
+          result += row.get(x) ?? ".";
+        }
+      } else {
+        result += ".".repeat(this.#width);
+      }
+    }
+    return result;
   }
 
   get crossings() {
