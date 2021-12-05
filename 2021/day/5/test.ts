@@ -1,12 +1,9 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 import { DensityMap, Line, parseInput } from "./mod.ts";
 
-function dedent(
-  template: { raw: readonly string[] | ArrayLike<string> },
-  ...substitutions: unknown[]
-) {
-  return String.raw(template, ...substitutions).replace(/^ +/gm, "").trim();
-}
+const dedent: typeof String.raw = (...args) => {
+  return String.raw(...args).replace(/^ +/gm, "").trim();
+};
 
 const input = await Deno.readTextFile(new URL("input.txt", import.meta.url));
 
@@ -34,7 +31,7 @@ const exampleParsedInput: readonly Line[] = [
   [{ x: 0, y: 0 }, { x: 8, y: 8 }],
   [{ x: 5, y: 5 }, { x: 8, y: 2 }],
 ];
-const exampleDisplayOutput = dedent`
+const exampleSimpleDisplayOutput = dedent`
   .......1..
   ..1....1..
   ..1....1..
@@ -44,6 +41,18 @@ const exampleDisplayOutput = dedent`
   ..........
   ..........
   ..........
+  222111....
+`;
+const exampleComplexDisplayOutput = dedent`
+  1.1....11.
+  .111...2..
+  ..2.1.111.
+  ...1.2.2..
+  .112313211
+  ...1.2....
+  ..1...1...
+  .1.....1..
+  1.......1.
   222111....
 `;
 
@@ -77,12 +86,17 @@ Deno.test("DensityMap.prototype.plot", () => {
   );
 });
 
-Deno.test("DensityMap.create", () => {
+Deno.test("DensityMap.create (simple)", () => {
   const filtered = exampleParsedInput.filter((l) =>
     l[0].x === l[1].x || l[0].y === l[1].y
   );
   const map = DensityMap.create(...filtered);
-  assertEquals(map.toString(), exampleDisplayOutput);
+  assertEquals(map.toString(), exampleSimpleDisplayOutput);
+});
+
+Deno.test("DensityMap.create (complex)", () => {
+  const map = DensityMap.create(...exampleParsedInput);
+  assertEquals(map.toString(), exampleComplexDisplayOutput);
 });
 
 Deno.test("DensityMap.prototype.@@iterator", () => {
@@ -93,6 +107,10 @@ Deno.test("DensityMap.prototype.@@iterator", () => {
     [...DensityMap.create(...filtered)].filter((n) => n > 1).length,
     5,
   );
+  assertEquals(
+    [...DensityMap.create(...exampleParsedInput)].filter((n) => n > 1).length,
+    12,
+  );
 });
 
 Deno.test("part 1", () => {
@@ -102,5 +120,12 @@ Deno.test("part 1", () => {
   assertEquals(
     [...DensityMap.create(...filtered)].filter((n) => n > 1).length,
     5690,
+  );
+});
+
+Deno.test("part 2", () => {
+  assertEquals(
+    [...DensityMap.create(...parseInput(input))].filter((n) => n > 1).length,
+    17741,
   );
 });
