@@ -11,25 +11,29 @@ Deno.test("parseInput", () => {
 });
 
 Deno.test("after 5 days", () => {
-  const state = [...exampleParsedInput];
-  simulate(state, 5);
-  assertEquals(state, [5, 6, 5, 3, 4, 5, 6, 7, 7, 8]);
+  assertEquals(simulate(exampleParsedInput, 5), 10);
 });
 
 Deno.test("after 18 days", () => {
-  const [...state] = [...exampleParsedInput];
-  simulate(state, 18);
-  assertEquals(state.length, 26);
+  assertEquals(simulate(exampleParsedInput, 18), 26);
 });
 
 Deno.test("after 80 days", () => {
-  const [...state] = [...exampleParsedInput];
-  simulate(state, 80);
-  assertEquals(state.length, 5934);
+  assertEquals(simulate(exampleParsedInput, 80), 5934);
+});
+
+Deno.test("after 256 days", () => {
+  assertEquals(simulate(exampleParsedInput, 256), 26984457539);
 });
 
 Deno.test("part 1", () => {
-  const [...state] = parseInput(input);
-  simulate(state, 80);
-  assertEquals(state.length, 359344);
+  assertEquals(simulate(parseInput(input), 80), 359344);
+});
+
+Deno.test("part 2", () => {
+  assertEquals(simulate(parseInput(input), 256), 1629570219571);
+});
+
+Deno.test("extra credit", () => {
+  assertEquals(simulate(parseInput(input), 4096), 3.132596872523094e+157);
 });

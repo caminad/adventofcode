@@ -2,15 +2,12 @@ export function parseInput(input: string): number[] {
   return input.match(/\d+/g)!.map(Number);
 }
 
-export function simulate(state: number[], days: number): void {
+export function simulate(population: readonly number[], days: number): number {
+  const timers = population.reduce((a, day) => (a[day]++, a), Array(9).fill(0));
   for (let day = 0; day < days; day++) {
-    for (const i in state) {
-      if (state[i] === 0) {
-        state[i] = 6;
-        state.push(8);
-      } else {
-        state[i]--;
-      }
-    }
+    const parents = timers.shift();
+    timers[6] += parents; // reintroduce parents with timer 6
+    timers.push(parents); // offspring are born with timer 8
   }
+  return timers.reduce((a, b) => a + b);
 }
