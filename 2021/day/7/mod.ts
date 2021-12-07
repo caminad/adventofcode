@@ -10,14 +10,6 @@ export function triangle(value: number): number {
   return value * (value + 1) / 2;
 }
 
-function getCounts(positions: number[]): number[] {
-  const counts = Array(Math.max(...positions) + 1).fill(0);
-  for (const position of positions) {
-    counts[position]++;
-  }
-  return counts;
-}
-
 export function findCheapestDestination(
   positions: number[],
   costFn = distance,

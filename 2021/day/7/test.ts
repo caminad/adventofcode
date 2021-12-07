@@ -34,18 +34,18 @@ Deno.test("distance", () => {
   );
 });
 
-Deno.test("findCheapestDestination", () => {
-  assertEquals(findCheapestDestination(exampleParsedInput), {
-    cost: 37,
-    destination: 2,
-  });
-});
-
 Deno.test("triangle", () => {
   assertEquals(
     Array.from(Array(10).keys(), triangle),
     [0, 1, 3, 6, 10, 15, 21, 28, 36, 45],
   );
+});
+
+Deno.test("findCheapestDestination", () => {
+  assertEquals(findCheapestDestination(exampleParsedInput), {
+    cost: 37,
+    destination: 2,
+  });
 });
 
 Deno.test("expensive movement", () => {
