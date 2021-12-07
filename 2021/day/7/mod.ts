@@ -10,25 +10,18 @@ export function triangle(value: number): number {
   return value * (value + 1) / 2;
 }
 
-export function findCheapestDestination(
-  positions: number[],
-  costFn = distance,
-): { cost: number; destination: number } {
+export function findMinCost(positions: number[], costFn = distance): number {
   const positionCounts = new Map<number, number>();
   for (const position of positions) {
     positionCounts.set(position, (positionCounts.get(position) ?? 0) + 1);
   }
 
-  let cost = Infinity, destination = 0;
-  while (true) {
+  for (let cost = Infinity, destination = -1;; destination++) {
     let nextCost = 0;
     for (const [position, count] of positionCounts) {
       nextCost += costFn(position, destination + 1) * count;
     }
-    if (nextCost >= cost) {
-      return { cost, destination };
-    }
-    destination++;
+    if (nextCost >= cost) return cost;
     cost = nextCost;
   }
 }

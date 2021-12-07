@@ -1,10 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import {
-  distance,
-  findCheapestDestination,
-  parseInput,
-  triangle,
-} from "./mod.ts";
+import { distance, findMinCost, parseInput, triangle } from "./mod.ts";
 
 const input = await Deno.readTextFile(new URL("input.txt", import.meta.url));
 
@@ -41,29 +36,23 @@ Deno.test("triangle", () => {
   );
 });
 
-Deno.test("findCheapestDestination", () => {
-  assertEquals(findCheapestDestination(exampleParsedInput), {
-    cost: 37,
-    destination: 2,
-  });
+Deno.test("findMinCost", () => {
+  assertEquals(findMinCost(exampleParsedInput), 37);
 });
 
 Deno.test("expensive movement", () => {
   const costFn = (p: number, d: number) => triangle(distance(p, d));
-  assertEquals(findCheapestDestination(exampleParsedInput, costFn), {
-    cost: 168,
-    destination: 5,
-  });
+  assertEquals(findMinCost(exampleParsedInput, costFn), 168);
 });
 
 Deno.test("part 1", () => {
-  assertEquals(findCheapestDestination(parseInput(input)).cost, 335330);
+  assertEquals(findMinCost(parseInput(input)), 335330);
 });
 
 Deno.test("part 2", () => {
   const costFn = (p: number, d: number) => triangle(distance(p, d));
   assertEquals(
-    findCheapestDestination(parseInput(input), costFn).cost,
+    findMinCost(parseInput(input), costFn),
     92439766,
   );
 });
