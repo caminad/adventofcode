@@ -33,7 +33,3 @@ Deno.test("part 1", () => {
 Deno.test("part 2", () => {
   assertEquals(simulate(parseInput(input), 256), 1629570219571);
 });
-
-Deno.test("extra credit", () => {
-  assertEquals(simulate(parseInput(input), 4096), 3.132596872523094e+157);
-});
