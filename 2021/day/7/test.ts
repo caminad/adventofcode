@@ -49,7 +49,8 @@ Deno.test("triangle", () => {
 });
 
 Deno.test("expensive movement", () => {
-  assertEquals(findCheapestDestination(exampleParsedInput, triangle), {
+  const costFn = (p: number, d: number) => triangle(distance(p, d));
+  assertEquals(findCheapestDestination(exampleParsedInput, costFn), {
     cost: 168,
     destination: 5,
   });
@@ -60,8 +61,9 @@ Deno.test("part 1", () => {
 });
 
 Deno.test("part 2", () => {
+  const costFn = (p: number, d: number) => triangle(distance(p, d));
   assertEquals(
-    findCheapestDestination(parseInput(input), triangle).cost,
+    findCheapestDestination(parseInput(input), costFn).cost,
     92439766,
   );
 });
