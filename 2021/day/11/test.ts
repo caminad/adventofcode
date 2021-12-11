@@ -276,6 +276,18 @@ Deno.test("Octopuses.prototype.next", () => {
   assertEquals(consume(Octopuses.parse(exampleInput), 100).flashes, 1656);
 });
 
+Deno.test("run to completion", () => {
+  let step = 1;
+  for (const _ of Octopuses.parse(exampleInput)) step++;
+  assertEquals(step, 195);
+});
+
 Deno.test("part 1", () => {
   assertEquals(consume(Octopuses.parse(input), 100).flashes, 1705);
+});
+
+Deno.test("part 2", () => {
+  let step = 1;
+  for (const _ of Octopuses.parse(input)) step++;
+  assertEquals(step, 265);
 });

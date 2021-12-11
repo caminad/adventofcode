@@ -66,7 +66,8 @@ export class Octopuses implements IterableIterator<{ flashes: number }> {
       flashers = this.#values.filter((octopus) => octopus.energy > 9);
       flashers.forEach((octopus) => this.#flash(octopus));
     } while (flashers.length > 0);
-    return { value: { flashes: this.#flashes } };
+    const done = this.#values.every((octopus) => octopus.energy === 0);
+    return { value: { flashes: this.#flashes }, done };
   }
 
   [Symbol.iterator]() {
