@@ -10,15 +10,20 @@ import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.19-alpha/deno-dom-w
 const decoder = new TextDecoder();
 const domParser = new DOMParser();
 
+const now = {
+  year: new Date().getFullYear().toString(),
+  day: new Date().getDate().toString(),
+};
+
 {
   const topLevel = await getToplevel();
-  const year = prompt("year", new Date().getFullYear().toString());
-  const day = prompt("day", new Date().getDate().toString());
+  const year = prompt("year", now.year) ?? now.year;
+  const day = prompt("day", now.day) ?? now.day;
 
-  const dirPath = `${year}/day/${day}`;
+  const dirPath = `${year}/${day.padStart(2, "0")}`;
   await checkClean(dirPath);
   const dir = new URL(`${dirPath}/`, topLevel);
-  const remote = new URL(dirPath, "https://adventofcode.com/");
+  const remote = new URL(`${year}/day/${day}`, "https://adventofcode.com/");
 
   const res = await fetch(remote);
   if (!res.ok) {
