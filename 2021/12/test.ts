@@ -33,21 +33,18 @@ Deno.test("Cave.parse", () => {
 
 Deno.test("Cave.prototype.path", () => {
   assertEquals(
-    Array.from(
-      Cave.parse(exampleInput).path(),
-      (caves) => caves.map(String),
-    ).sort(),
+    Array.from(Cave.parse(exampleInput).path(), String).sort(),
     [
-      ["start", "A", "b", "A", "c", "A", "end"],
-      ["start", "A", "b", "A", "end"],
-      ["start", "A", "b", "end"],
-      ["start", "A", "c", "A", "b", "A", "end"],
-      ["start", "A", "c", "A", "b", "end"],
-      ["start", "A", "c", "A", "end"],
-      ["start", "A", "end"],
-      ["start", "b", "A", "c", "A", "end"],
-      ["start", "b", "A", "end"],
-      ["start", "b", "end"],
+      `start,A,b,A,c,A,end`,
+      `start,A,b,A,end`,
+      `start,A,b,end`,
+      `start,A,c,A,b,A,end`,
+      `start,A,c,A,b,end`,
+      `start,A,c,A,end`,
+      `start,A,end`,
+      `start,b,A,c,A,end`,
+      `start,b,A,end`,
+      `start,b,end`,
     ],
   );
   assertEquals(
@@ -60,6 +57,62 @@ Deno.test("Cave.prototype.path", () => {
   );
 });
 
+Deno.test("Cave.prototype.path with revisits", () => {
+  assertEquals(
+    Array.from(Cave.parse(exampleInput).path(1), String).sort(),
+    [
+      `start,A,b,A,b,A,c,A,end`,
+      `start,A,b,A,b,A,end`,
+      `start,A,b,A,b,end`,
+      `start,A,b,A,c,A,b,A,end`,
+      `start,A,b,A,c,A,b,end`,
+      `start,A,b,A,c,A,c,A,end`,
+      `start,A,b,A,c,A,end`,
+      `start,A,b,A,end`,
+      `start,A,b,d,b,A,c,A,end`,
+      `start,A,b,d,b,A,end`,
+      `start,A,b,d,b,end`,
+      `start,A,b,end`,
+      `start,A,c,A,b,A,b,A,end`,
+      `start,A,c,A,b,A,b,end`,
+      `start,A,c,A,b,A,c,A,end`,
+      `start,A,c,A,b,A,end`,
+      `start,A,c,A,b,d,b,A,end`,
+      `start,A,c,A,b,d,b,end`,
+      `start,A,c,A,b,end`,
+      `start,A,c,A,c,A,b,A,end`,
+      `start,A,c,A,c,A,b,end`,
+      `start,A,c,A,c,A,end`,
+      `start,A,c,A,end`,
+      `start,A,end`,
+      `start,b,A,b,A,c,A,end`,
+      `start,b,A,b,A,end`,
+      `start,b,A,b,end`,
+      `start,b,A,c,A,b,A,end`,
+      `start,b,A,c,A,b,end`,
+      `start,b,A,c,A,c,A,end`,
+      `start,b,A,c,A,end`,
+      `start,b,A,end`,
+      `start,b,d,b,A,c,A,end`,
+      `start,b,d,b,A,end`,
+      `start,b,d,b,end`,
+      `start,b,end`,
+    ],
+  );
+  assertEquals(
+    Array.from(
+      Cave.parse(
+        `fs-end he-DX fs-he start-DX pj-DX end-zg zg-sl zg-pj pj-he RW-he fs-DX pj-RW zg-RW start-pj he-WI zg-he pj-fs start-RW`,
+      ).path(1),
+    ).length,
+    3509,
+  );
+});
+
 Deno.test("part 1", () => {
   assertEquals(Array.from(Cave.parse(input).path()).length, 5457);
+});
+
+Deno.test("part 2", () => {
+  assertEquals(Array.from(Cave.parse(input).path(1)).length, 128506);
 });

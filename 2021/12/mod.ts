@@ -3,8 +3,8 @@ export class Cave {
 
   constructor(readonly name: string) {}
 
-  isBig() {
-    return /[A-Z]/.test(this.name);
+  isSmall() {
+    return /[a-z]/.test(this.name);
   }
 
   static parse(input: string): Cave {
@@ -39,15 +39,21 @@ export class Cave {
     return this.name;
   }
 
-  *path(trail: Cave[] = []): IterableIterator<Cave[]> {
+  *path(revisits = 0, trail: Cave[] = []): IterableIterator<Cave[]> {
+    if (this === trail[0]) return;
+    if (this.isSmall() && trail.includes(this)) {
+      if (revisits > 0) {
+        revisits--;
+      } else {
+        return;
+      }
+    }
     trail = [...trail, this];
     if (this.name === "end") {
       yield trail;
-      return;
-    }
-    for (const other of this.#connections) {
-      if (other.isBig() || !trail.includes(other)) {
-        yield* other.path(trail);
+    } else {
+      for (const other of this.#connections) {
+        yield* other.path(revisits, trail);
       }
     }
   }
