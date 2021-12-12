@@ -1,86 +1,91 @@
-interface Octopus {
-  energy: number;
-  north?: Octopus;
-  south?: Octopus;
-  west?: Octopus;
-  east?: Octopus;
-}
+export class Octopus implements IterableIterator<number> {
+  #energy: number;
+  #north?: Octopus;
+  #south?: Octopus;
+  #west?: Octopus;
+  #east?: Octopus;
 
-export class Octopuses implements IterableIterator<{ flashes: number }> {
-  readonly #side = 10;
-  #values = Array.from(
-    Array(this.#side ** 2),
-    (): Octopus => ({ energy: 0 }),
-  ).map((octopus, i, a) => {
-    const row = Math.floor(i / this.#side);
-    const col = i % this.#side;
-    if (row > 0) {
-      octopus.north = a[i - this.#side];
-    }
-    if (row < this.#side - 1) {
-      octopus.south = a[i + this.#side];
-    }
-    if (col > 0) {
-      octopus.west = a[i - 1];
-    }
-    if (col < this.#side - 1) {
-      octopus.east = a[i + 1];
-    }
-    return octopus;
-  });
-  #flashes = 0;
-
-  static parse(input: string): Octopuses {
-    const octopuses = new Octopuses();
-    const energies = Array.from(input.matchAll(/\d/g), Number);
-    for (const [offset, energy] of energies.entries()) {
-      octopuses.#values[offset].energy = energy;
-    }
-    return octopuses;
+  constructor(energy: number) {
+    this.#energy = energy;
   }
 
-  *#lateralNeighborhood(
-    octopus: Octopus | undefined,
-  ): IterableIterator<Octopus> {
-    if (octopus?.west && octopus.west.energy > 0) yield octopus.west;
-    if (octopus && octopus.energy > 0) yield octopus;
-    if (octopus?.east && octopus.east.energy > 0) yield octopus.east;
+  static parse(input: string): Octopus {
+    const octopuses = Array.from(
+      input.matchAll(/\d/g),
+      ([d]) => new Octopus(Number(d)),
+    );
+    const side = Math.floor(Math.sqrt(octopuses.length));
+    octopuses.forEach((octopus, index, octopuses) => {
+      if (index / side < side - 1) {
+        octopus.#south = octopuses[index + side];
+        octopus.#south.#north = octopus;
+      }
+      if (index % side < side - 1) {
+        octopus.#east = octopuses[index + 1];
+        octopus.#east.#west = octopus;
+      }
+    });
+    return octopuses[0];
   }
 
-  *#neighborhood(octopus: Octopus) {
-    yield* this.#lateralNeighborhood(octopus.north);
-    yield* this.#lateralNeighborhood(octopus);
-    yield* this.#lateralNeighborhood(octopus.south);
+  *#horizontal(): IterableIterator<Octopus> {
+    yield this;
+    if (this.#east) yield* this.#east.#horizontal();
   }
 
-  #flash(octopus: Octopus) {
-    octopus.energy = 0;
-    this.#flashes++;
-    for (const neighbor of this.#neighborhood(octopus)) neighbor.energy++;
+  *#swarm(): IterableIterator<Octopus> {
+    yield* this.#horizontal();
+    if (this.#south) yield* this.#south.#swarm();
   }
 
-  next() {
-    for (const octopus of this.#values) octopus.energy++;
-    let flashers;
-    do {
-      flashers = this.#values.filter((octopus) => octopus.energy > 9);
-      flashers.forEach((octopus) => this.#flash(octopus));
-    } while (flashers.length > 0);
-    const done = this.#values.every((octopus) => octopus.energy === 0);
-    return { value: { flashes: this.#flashes }, done };
+  toString(): string {
+    const row = Array.from(this.#horizontal(), (o) => o.#energy).join("");
+    if (this.#south) return row + "\n" + this.#south.toString();
+    return row;
+  }
+
+  *#rowNeighborhood(): IterableIterator<Octopus> {
+    if (this.#west && this.#west.#energy) yield this.#west;
+    if (this.#energy) yield this;
+    if (this.#east && this.#east.#energy) yield this.#east;
+  }
+
+  *#neighborhood(): IterableIterator<Octopus> {
+    if (this.#north) yield* this.#north.#rowNeighborhood();
+    yield* this.#rowNeighborhood();
+    if (this.#south) yield* this.#south.#rowNeighborhood();
+  }
+
+  #willFlash(): Octopus[] {
+    return Array.from(this.#swarm()).filter((o) => o.#energy > 9);
+  }
+
+  #flash(): number {
+    const willFlash = this.#willFlash();
+    if (!willFlash.length) return 0;
+    for (const octopus of willFlash) {
+      octopus.#energy = 0;
+      for (const neighbor of octopus.#neighborhood()) neighbor.#energy++;
+    }
+    return willFlash.length + this.#flash();
+  }
+
+  next(): IteratorResult<number, number> {
+    for (const octopus of this.#swarm()) octopus.#energy++;
+    const value = this.#flash();
+    for (const octopus of this.#swarm()) {
+      if (octopus.#energy) return { value };
+    }
+    return { value, done: true };
+  }
+
+  countFlashes(steps: number): number {
+    let count = 0;
+    while (steps-- > 0) count += this.next().value;
+    return count;
   }
 
   [Symbol.iterator]() {
     return this;
-  }
-
-  toString() {
-    return Array.from(
-      Array(10),
-      (_, row) =>
-        this.#values.slice(row * this.#side, (row + 1) * this.#side)
-          .map((o) => o.energy).join(""),
-    )
-      .join("\n");
   }
 }

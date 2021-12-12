@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
-import { Octopuses } from "./mod.ts";
+import { Octopus } from "./mod.ts";
 
 const input = await Deno.readTextFile(new URL("input.txt", import.meta.url));
 
@@ -219,75 +219,70 @@ const steps = {
 6789998766`,
 };
 
-function consume<T>(iterator: Iterator<T>, count: number): T {
-  let value;
-  while (count-- > 0) {
-    ({ value } = iterator.next());
-  }
-  return value;
-}
-
-Deno.test("Octopuses.parse", () => {
-  assertEquals(Octopuses.parse(exampleInput).toString(), steps[0]);
+Deno.test("Octopus.parse", () => {
+  assertEquals(Octopus.parse(exampleInput).toString(), steps[0]);
 });
 
-Deno.test("Octopuses.prototype.next", () => {
-  const octopuses = Octopuses.parse(exampleInput);
-  assertEquals(octopuses.next().value.flashes, 0);
-  assertEquals(octopuses.toString(), steps[1]);
-  assertEquals(octopuses.next().value.flashes, 35);
-  assertEquals(octopuses.toString(), steps[2]);
-  assertEquals(octopuses.next().value.flashes, 80);
-  assertEquals(octopuses.toString(), steps[3]);
-  assertEquals(octopuses.next().value.flashes, 96);
-  assertEquals(octopuses.toString(), steps[4]);
-  assertEquals(octopuses.next().value.flashes, 104);
-  assertEquals(octopuses.toString(), steps[5]);
-  assertEquals(octopuses.next().value.flashes, 105);
-  assertEquals(octopuses.toString(), steps[6]);
-  assertEquals(octopuses.next().value.flashes, 112);
-  assertEquals(octopuses.toString(), steps[7]);
-  assertEquals(octopuses.next().value.flashes, 136);
-  assertEquals(octopuses.toString(), steps[8]);
-  assertEquals(octopuses.next().value.flashes, 175);
-  assertEquals(octopuses.toString(), steps[9]);
-  assertEquals(octopuses.next().value.flashes, 204);
-  assertEquals(octopuses.toString(), steps[10]);
+Deno.test("Octopus.prototype.next", () => {
+  const swarm = Octopus.parse(exampleInput);
+  let flashes = 0;
+  assertEquals(flashes += swarm.next().value, 0);
+  assertEquals(swarm.toString(), steps[1]);
+  assertEquals(flashes += swarm.next().value, 35);
+  assertEquals(swarm.toString(), steps[2]);
+  assertEquals(flashes += swarm.next().value, 80);
+  assertEquals(swarm.toString(), steps[3]);
+  assertEquals(flashes += swarm.next().value, 96);
+  assertEquals(swarm.toString(), steps[4]);
+  assertEquals(flashes += swarm.next().value, 104);
+  assertEquals(swarm.toString(), steps[5]);
+  assertEquals(flashes += swarm.next().value, 105);
+  assertEquals(swarm.toString(), steps[6]);
+  assertEquals(flashes += swarm.next().value, 112);
+  assertEquals(swarm.toString(), steps[7]);
+  assertEquals(flashes += swarm.next().value, 136);
+  assertEquals(swarm.toString(), steps[8]);
+  assertEquals(flashes += swarm.next().value, 175);
+  assertEquals(swarm.toString(), steps[9]);
+  assertEquals(flashes += swarm.next().value, 204);
+  assertEquals(swarm.toString(), steps[10]);
+});
 
-  assertEquals(consume(octopuses, 10).flashes, 344);
-  assertEquals(octopuses.toString(), steps[20]);
-  assertEquals(consume(octopuses, 10).flashes, 513);
-  assertEquals(octopuses.toString(), steps[30]);
-  assertEquals(consume(octopuses, 10).flashes, 703);
-  assertEquals(octopuses.toString(), steps[40]);
-  assertEquals(consume(octopuses, 10).flashes, 842);
-  assertEquals(octopuses.toString(), steps[50]);
-  assertEquals(consume(octopuses, 10).flashes, 1016);
-  assertEquals(octopuses.toString(), steps[60]);
-  assertEquals(consume(octopuses, 10).flashes, 1202);
-  assertEquals(octopuses.toString(), steps[70]);
-  assertEquals(consume(octopuses, 10).flashes, 1344);
-  assertEquals(octopuses.toString(), steps[80]);
-  assertEquals(consume(octopuses, 10).flashes, 1505);
-  assertEquals(octopuses.toString(), steps[90]);
-  assertEquals(consume(octopuses, 10).flashes, 1656);
-  assertEquals(octopuses.toString(), steps[100]);
+Deno.test("Octopus.prototype.countFlashes", () => {
+  const swarm = Octopus.parse(exampleInput);
+  let flashes = 0;
+  assertEquals(flashes += swarm.countFlashes(10), 204);
+  assertEquals(swarm.toString(), steps[10]);
+  assertEquals(flashes += swarm.countFlashes(10), 344);
+  assertEquals(swarm.toString(), steps[20]);
+  assertEquals(flashes += swarm.countFlashes(10), 513);
+  assertEquals(swarm.toString(), steps[30]);
+  assertEquals(flashes += swarm.countFlashes(10), 703);
+  assertEquals(swarm.toString(), steps[40]);
+  assertEquals(flashes += swarm.countFlashes(10), 842);
+  assertEquals(swarm.toString(), steps[50]);
+  assertEquals(flashes += swarm.countFlashes(10), 1016);
+  assertEquals(swarm.toString(), steps[60]);
+  assertEquals(flashes += swarm.countFlashes(10), 1202);
+  assertEquals(swarm.toString(), steps[70]);
+  assertEquals(flashes += swarm.countFlashes(10), 1344);
+  assertEquals(swarm.toString(), steps[80]);
+  assertEquals(flashes += swarm.countFlashes(10), 1505);
+  assertEquals(swarm.toString(), steps[90]);
+  assertEquals(flashes += swarm.countFlashes(10), 1656);
+  assertEquals(swarm.toString(), steps[100]);
 
-  assertEquals(consume(Octopuses.parse(exampleInput), 100).flashes, 1656);
+  assertEquals(Octopus.parse(exampleInput).countFlashes(100), 1656);
 });
 
 Deno.test("run to completion", () => {
-  let step = 1;
-  for (const _ of Octopuses.parse(exampleInput)) step++;
-  assertEquals(step, 195);
+  assertEquals(Array.from(Octopus.parse(exampleInput)).length + 1, 195);
 });
 
 Deno.test("part 1", () => {
-  assertEquals(consume(Octopuses.parse(input), 100).flashes, 1705);
+  assertEquals(Octopus.parse(input).countFlashes(100), 1705);
 });
 
 Deno.test("part 2", () => {
-  let step = 1;
-  for (const _ of Octopuses.parse(input)) step++;
-  assertEquals(step, 265);
+  assertEquals(Array.from(Octopus.parse(input)).length + 1, 265);
 });
