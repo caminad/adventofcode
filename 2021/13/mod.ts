@@ -1,71 +1,80 @@
-type Dot = readonly [x: number, y: number];
-type Fold = readonly [axis: "x" | "y", offset: number];
-
-function Dot(m: RegExpMatchArray): [x: number, y: number] {
-  return [Number(m[1]), Number(m[2])];
-}
-
-function Fold(m: RegExpMatchArray): ["x" | "y", number] {
-  if (m[1] === "x" || m[1] === "y") {
-    return [m[1], Number(m[2])];
-  }
-  throw new Error(`Not an axis: ${m[1]}`);
-}
+type Dot = `${number},${number}`;
+type Fold = { readonly x: number } | { readonly y: number };
 
 export class Manual {
-  constructor(
-    readonly dots: readonly Dot[],
-    readonly folds: readonly Fold[],
-  ) {}
+  readonly #dots: ReadonlySet<Dot>;
+  readonly #folds: ReadonlyArray<Fold>;
+  constructor(dots: Iterable<Dot>, folds: Iterable<Fold>) {
+    this.#dots = new Set(dots);
+    this.#folds = Array.from(folds);
+  }
 
   static parse(s: string): Manual {
     return new Manual(
-      Array.from(s.matchAll(/(\d+),(\d+)/g), Dot),
-      Array.from(s.matchAll(/(x|y)=(\d+)/g), Fold),
+      s.match(/\d+,\d+/g) as Dot[],
+      Array.from(
+        s.matchAll(/(x|y)=(\d+)/g),
+        (m) => ({ [m[1]]: Number(m[2]) } as Fold),
+      ),
     );
   }
 
-  sparseDots() {
-    const rows = new Map<number, Set<number>>();
-    for (const [x, y] of this.dots) {
-      let row = rows.get(y);
-      if (!row) rows.set(y, row = new Set());
-      row.add(x);
-    }
-    return rows;
+  get size(): number {
+    return this.#dots.size;
   }
 
-  getSize() {
-    let size = 0;
-    for (const row of this.sparseDots().values()) {
-      size += row.size;
-    }
-    return size;
+  #reflect(dot: Dot): Dot {
+    const fold = this.#folds.at(0);
+    if (!fold) return dot;
+    let [x, y] = dot.split(",").map(Number);
+    if ("x" in fold && x > fold.x) x = 2 * fold.x - x;
+    if ("y" in fold && y > fold.y) y = 2 * fold.y - y;
+    return `${x},${y}`;
   }
 
   fold(): Manual {
-    const [[axis, offset], ...folds] = this.folds;
-    const dots: Dot[] = this.dots.map(([x, y]) => {
-      if (axis === "y" && y > offset) {
-        return [x, 2 * offset - y];
-      }
-      if (axis === "x" && x > offset) {
-        return [2 * offset - x, y];
-      }
-      return [x, y];
-    });
-    return new Manual(dots, folds);
+    const dots = Array.from(this.#dots, (dot) => this.#reflect(dot));
+    return new Manual(dots, this.#folds.slice(1));
   }
 
-  toString() {
-    const dots = this.sparseDots();
-    const width = Math.max(...this.dots.map((d) => d[0])) + 1;
-    const height = Math.max(...this.dots.map((d) => d[1])) + 1;
-    return Array.from(Array(height), (_, y) => {
-      return Array.from(Array(width), (_, x) => {
-        if (dots.get(y)?.has(x)) return "#";
-        return ".";
-      }).join("");
-    }).join("\n");
+  foldAll(): Manual {
+    if (this.#folds.length === 0) return this;
+    return this.fold().foldAll();
+  }
+
+  #dimensions(): [width: number, height: number] {
+    let [width, height] = [0, 0];
+    for (const dot of this.#dots) {
+      const [x, y] = dot.split(",").map(Number);
+      if (x >= width) width = x + 1;
+      if (y >= height) height = y + 1;
+    }
+    return [width, height];
+  }
+
+  #charAt(x: number, y: number): string {
+    if (this.#dots.has(`${x},${y}`)) return "██";
+    const fold = this.#folds.at(0);
+    if (fold) {
+      if ("x" in fold && fold.x === x) return "▕ ";
+      if ("y" in fold && fold.y === y) return "━━";
+    }
+    return "  ";
+  }
+
+  #rowAt(y: number, width: number): string {
+    return Array.from(Array(width).keys(), (x) => this.#charAt(x, y))
+      .join("");
+  }
+
+  toString(): string {
+    const [width, height] = this.#dimensions();
+    const result = [];
+    result.push("┌─" + "──".repeat(width) + "─┐");
+    for (let y = 0; y < height; y++) {
+      result.push("│ " + this.#rowAt(y, width) + " │");
+    }
+    result.push("└─" + "──".repeat(width) + "─┘");
+    return result.join("\n");
   }
 }
