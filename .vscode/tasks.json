@@ -4,25 +4,39 @@
     {
       "type": "deno",
       "command": "test",
-      "args": ["--allow-all", "--coverage=.coverage"],
+      "args": [
+        "--allow-all",
+        "--coverage=.coverage"
+      ],
       "problemMatcher": [
         "$deno-test"
       ],
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
+      "group": "test",
       "label": "deno: test"
     },
     {
       "type": "deno",
       "command": "coverage",
-      "args": [".coverage"],
+      "args": [
+        ".coverage"
+      ],
       "problemMatcher": [
         "$deno-test"
       ],
       "group": "none",
       "label": "deno: coverage"
+    },
+    {
+      "type": "cargo",
+      "subcommand": "test",
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "label": "Rust: cargo test - adventofcode"
     }
   ]
 }
