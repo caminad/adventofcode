@@ -5,7 +5,13 @@
     "https://deno.land": true
   },
   "deno.unstable": false,
-  "editor.defaultFormatter": "denoland.vscode-deno",
+  "prettier.enable": false,
+  "[typescript][typescriptreact][javascript][javascriptreact][markdown][json][jsonc]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust"
+  },
   "[ignore]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   }

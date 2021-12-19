@@ -7,9 +7,19 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  deno:
+    name: 'Test Deno Solutions'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
       - run: deno test --allow-read
+  rust:
+    name: 'Test Rust Solutions'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
