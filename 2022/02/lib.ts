@@ -1,63 +1,48 @@
-type Play = "rock" | "paper" | "scissors";
-
-interface Round {
-  readonly opponent: Play;
-  readonly player: Play;
-}
-
-const SCORES = {
-  rock: 1,
-  paper: 2,
-  scissors: 3,
-  loss: 0,
-  tie: 3,
-  win: 6,
-};
-
-const RULES = {
-  rock: {
-    rock: "tie",
-    paper: "loss",
-    scissors: "win",
-  } as const,
-  paper: {
-    rock: "win",
-    paper: "tie",
-    scissors: "loss",
-  } as const,
-  scissors: {
-    rock: "loss",
-    paper: "win",
-    scissors: "tie",
-  } as const,
-} as const;
-
-const OPPONENT_PLAYS: ReadonlyMap<string, Play> = new Map([
-  ["A", "rock"],
-  ["B", "paper"],
-  ["C", "scissors"],
-]);
-
-const PLAYER_PLAYS: ReadonlyMap<string, Play> = new Map([
-  ["X", "rock"],
-  ["Y", "paper"],
-  ["Z", "scissors"],
-]);
+export type Round = `${"A" | "B" | "C"} ${"X" | "Y" | "Z"}`;
 
 export function* parse(input: string): IterableIterator<Round> {
-  for (const m of input.matchAll(/(\S)\s(\S)/g)) {
-    const opponent = OPPONENT_PLAYS.get(m[1]);
-    if (!opponent) {
-      throw Error(`Unexpected opponent input: ${m[1]}`);
-    }
-    const player = PLAYER_PLAYS.get(m[2]);
-    if (!player) {
-      throw Error(`Unexpected player input: ${m[2]}`);
-    }
-    yield { opponent, player };
+  for (const [round] of input.matchAll(/[ABC] [XYZ]/g)) {
+    yield round as Round;
   }
 }
 
-export function score(round: Round): number {
-  return SCORES[round.player] + SCORES[RULES[round.player][round.opponent]];
+const ROCK = 1;
+const PAPER = 2;
+const SCISSORS = 3;
+const LOSS = 0;
+const DRAW = 3;
+const WIN = 6;
+
+type Rules = Record<Round, number>;
+
+export const RULES_V1: Readonly<Rules> = {
+  "A X": ROCK + DRAW,
+  "A Y": PAPER + WIN,
+  "A Z": SCISSORS + LOSS,
+  "B X": ROCK + LOSS,
+  "B Y": PAPER + DRAW,
+  "B Z": SCISSORS + WIN,
+  "C X": ROCK + WIN,
+  "C Y": PAPER + LOSS,
+  "C Z": SCISSORS + DRAW,
+};
+
+export const RULES_V2: Readonly<Rules> = {
+  "A X": LOSS + SCISSORS,
+  "A Y": DRAW + ROCK,
+  "A Z": WIN + PAPER,
+  "B X": LOSS + ROCK,
+  "B Y": DRAW + PAPER,
+  "B Z": WIN + SCISSORS,
+  "C X": LOSS + PAPER,
+  "C Y": DRAW + SCISSORS,
+  "C Z": WIN + ROCK,
+};
+
+export function score(rounds: Iterable<Round>, rules: Readonly<Rules>): number {
+  let total = 0;
+  for (const round of rounds) {
+    total += rules[round];
+  }
+  return total;
 }

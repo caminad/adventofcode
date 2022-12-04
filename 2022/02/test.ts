@@ -1,29 +1,28 @@
 import { assertEquals } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { parse, score } from "./lib.ts";
+import { parse, Round, RULES_V1, RULES_V2, score } from "./lib.ts";
 
 const input = Deno.readTextFileSync(new URL("input.txt", import.meta.url));
 
 Deno.test("parse", () => {
-  assertEquals(
-    [...parse("A Y B X C Z")],
-    [
-      { opponent: "rock", player: "paper" },
-      { opponent: "paper", player: "rock" },
-      { opponent: "scissors", player: "scissors" },
-    ],
-  );
+  assertEquals<Round[]>([...parse("A Y B X C Z")], ["A Y", "B X", "C Z"]);
 });
 
 Deno.test("score", () => {
-  assertEquals(score({ opponent: "rock", player: "paper" }), 8);
-  assertEquals(score({ opponent: "paper", player: "rock" }), 1);
-  assertEquals(score({ opponent: "scissors", player: "scissors" }), 6);
+  assertEquals(score(["A Y"], RULES_V1), 8);
+  assertEquals(score(["B X"], RULES_V1), 1);
+  assertEquals(score(["C Z"], RULES_V1), 6);
+  assertEquals(score(["A Y", "B X", "C Z"], RULES_V1), 15);
+
+  assertEquals(score(["A Y"], RULES_V2), 4);
+  assertEquals(score(["B X"], RULES_V2), 1);
+  assertEquals(score(["C Z"], RULES_V2), 7);
+  assertEquals(score(["A Y", "B X", "C Z"], RULES_V2), 12);
 });
 
 Deno.test("part 1", () => {
-  let total = 0;
-  for (const round of parse(input)) {
-    total += score(round);
-  }
-  assertEquals(total, 14297);
+  assertEquals(score(parse(input), RULES_V1), 14297);
+});
+
+Deno.test("part 2", () => {
+  assertEquals(score(parse(input), RULES_V2), 10498);
 });
