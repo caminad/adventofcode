@@ -1,18 +1,11 @@
 {
+  "deno.config": "deno.json",
   "deno.enable": true,
-  "deno.lint": true,
-  "deno.suggest.imports.hosts": {
-    "https://deno.land": true
-  },
-  "deno.unstable": false,
   "prettier.enable": false,
   "[typescript][typescriptreact][javascript][javascriptreact][markdown][json][jsonc]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[rust]": {
-    "editor.defaultFormatter": "rust-lang.rust"
-  },
-  "[ignore]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
   }
 }

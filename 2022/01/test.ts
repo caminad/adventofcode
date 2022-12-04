@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { assertEquals } from "testing/asserts.ts";
 import { leaders, parse, sum } from "./lib.ts";
 
 const input = Deno.readTextFileSync(new URL("input.txt", import.meta.url));

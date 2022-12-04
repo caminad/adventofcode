@@ -1,8 +1,4 @@
-import {
-  assert,
-  assertEquals,
-  assertFalse,
-} from "https://deno.land/std@0.167.0/testing/asserts.ts";
+import { assert, assertEquals, assertFalse } from "testing/asserts.ts";
 import { covers, overlaps, parse } from "./lib.ts";
 
 const input = Deno.readTextFileSync(new URL("input.txt", import.meta.url));

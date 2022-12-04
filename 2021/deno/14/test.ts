@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
+import { assertEquals } from "testing/asserts.ts";
 import { getElementCounts, getNextStep, getSteps, parseInput } from "./mod.ts";
 
 const input = await Deno.readTextFile(new URL("input.txt", import.meta.url));
@@ -22,7 +22,7 @@ BC -> B
 CC -> N
 CN -> C
 `;
-const exampleParsedInput = [
+const exampleParsedInput: [string, Map<string, string>] = [
   "NNCB",
   new Map([
     ["CH", "B"],
@@ -42,7 +42,7 @@ const exampleParsedInput = [
     ["CC", "N"],
     ["CN", "C"],
   ]),
-] as const;
+];
 
 Deno.test("parseInput", () => {
   assertEquals(parseInput(exampleInput), exampleParsedInput);

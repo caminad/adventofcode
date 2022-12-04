@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.117.0/testing/asserts.ts";
+import { assertEquals } from "testing/asserts.ts";
 import { Cave } from "./mod.ts";
 
 const input = await Deno.readTextFile(new URL("input.txt", import.meta.url));
