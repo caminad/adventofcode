@@ -3,7 +3,7 @@ import {
   assertEquals,
   assertFalse,
 } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { covers, parse } from "./lib.ts";
+import { covers, overlaps, parse } from "./lib.ts";
 
 const input = Deno.readTextFileSync(new URL("input.txt", import.meta.url));
 
@@ -37,6 +37,15 @@ Deno.test("covers", () => {
   assertFalse(covers([4, 8], [2, 6]));
 });
 
+Deno.test("overlaps", () => {
+  assertFalse(overlaps([2, 4], [6, 8]));
+  assertFalse(overlaps([2, 3], [4, 5]));
+  assert(overlaps([5, 7], [7, 9]));
+  assert(overlaps([2, 8], [3, 7]));
+  assert(overlaps([6, 6], [4, 6]));
+  assert(overlaps([2, 6], [4, 8]));
+});
+
 Deno.test("part 1", () => {
   let count = 0;
   for (const [a, b] of parse(input)) {
@@ -45,4 +54,14 @@ Deno.test("part 1", () => {
     }
   }
   assertEquals(count, 477);
+});
+
+Deno.test("part 2", () => {
+  let count = 0;
+  for (const [a, b] of parse(input)) {
+    if (overlaps(a, b)) {
+      count++;
+    }
+  }
+  assertEquals(count, 830);
 });
