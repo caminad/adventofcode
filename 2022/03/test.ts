@@ -1,20 +1,45 @@
 import { assertEquals } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { intersect, parse, priority } from "./lib.ts";
+import {
+  findCommonItem,
+  inCompartments,
+  inElfGroups,
+  parse,
+  priority,
+} from "./lib.ts";
 
 const input = Deno.readTextFileSync(new URL("input.txt", import.meta.url));
 
 Deno.test("parse", () => {
-  assertEquals<[string, string][]>(
+  assertEquals<string[]>(
+    [...parse(`
+      vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+      PmmdzqPrVvPwwTWBwg
+      wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+      ttgJtRGJQctTZtZT
+      CrZsJsPPZsGzwwsLwLmpwMDw
+    `)],
     [
-      ...parse(`
-        vJrwpWtwJgWrhcsFMMfFFhFp
-        jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
-        PmmdzqPrVvPwwTWBwg
-        wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
-        ttgJtRGJQctTZtZT
-        CrZsJsPPZsGzwwsLwLmpwMDw
-      `),
+      "vJrwpWtwJgWrhcsFMMfFFhFp",
+      "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+      "PmmdzqPrVvPwwTWBwg",
+      "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+      "ttgJtRGJQctTZtZT",
+      "CrZsJsPPZsGzwwsLwLmpwMDw",
     ],
+  );
+});
+
+Deno.test("inCompartments", () => {
+  assertEquals<[string, string][]>(
+    [...inCompartments([
+      "vJrwpWtwJgWrhcsFMMfFFhFp",
+      "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+      "PmmdzqPrVvPwwTWBwg",
+      "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+      "ttgJtRGJQctTZtZT",
+      "CrZsJsPPZsGzwwsLwLmpwMDw",
+    ])],
     [
       ["vJrwpWtwJgWr", "hcsFMMfFFhFp"],
       ["jqHRNqRjqzjGDLGL", "rsFMfFZSrLrFZsSL"],
@@ -26,13 +51,38 @@ Deno.test("parse", () => {
   );
 });
 
-Deno.test("intersect", () => {
-  assertEquals(intersect("vJrwpWtwJgWr", "hcsFMMfFFhFp"), new Set("p"));
-  assertEquals(intersect("jqHRNqRjqzjGDLGL", "rsFMfFZSrLrFZsSL"), new Set("L"));
-  assertEquals(intersect("PmmdzqPrV", "vPwwTWBwg"), new Set("P"));
-  assertEquals(intersect("wMqvLMZHhHMvwLH", "jbvcjnnSBnvTQFn"), new Set("v"));
-  assertEquals(intersect("ttgJtRGJ", "QctTZtZT"), new Set("t"));
-  assertEquals(intersect("CrZsJsPPZsGz", "wwsLwLmpwMDw"), new Set("s"));
+Deno.test("inElfGroups", () => {
+  assertEquals<[string, string, string][]>(
+    [...inElfGroups([
+      "vJrwpWtwJgWrhcsFMMfFFhFp",
+      "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+      "PmmdzqPrVvPwwTWBwg",
+      "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+      "ttgJtRGJQctTZtZT",
+      "CrZsJsPPZsGzwwsLwLmpwMDw",
+    ])],
+    [
+      [
+        "vJrwpWtwJgWrhcsFMMfFFhFp",
+        "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+        "PmmdzqPrVvPwwTWBwg",
+      ],
+      [
+        "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
+        "ttgJtRGJQctTZtZT",
+        "CrZsJsPPZsGzwwsLwLmpwMDw",
+      ],
+    ],
+  );
+});
+
+Deno.test("findCommonItem", () => {
+  assertEquals(findCommonItem(["vJrwpWtwJgWr", "hcsFMMfFFhFp"]), "p");
+  assertEquals(findCommonItem(["jqHRNqRjqzjGDLGL", "rsFMfFZSrLrFZsSL"]), "L");
+  assertEquals(findCommonItem(["PmmdzqPrV", "vPwwTWBwg"]), "P");
+  assertEquals(findCommonItem(["wMqvLMZHhHMvwLH", "jbvcjnnSBnvTQFn"]), "v");
+  assertEquals(findCommonItem(["ttgJtRGJ", "QctTZtZT"]), "t");
+  assertEquals(findCommonItem(["CrZsJsPPZsGz", "wwsLwLmpwMDw"]), "s");
 });
 
 Deno.test("priority", () => {
@@ -46,7 +96,11 @@ Deno.test("priority", () => {
 });
 
 Deno.test("part 1", () => {
-  const total = Array.from(parse(input), ([a, b]) => intersect(a, b))
-    .reduce((a, e) => a + priority(e), 0);
-  assertEquals(total, 8039);
+  const commonItems = Array.from(inCompartments(parse(input)), findCommonItem);
+  assertEquals(priority(commonItems), 8039);
+});
+
+Deno.test("part 2", () => {
+  const commonItems = Array.from(inElfGroups(parse(input)), findCommonItem);
+  assertEquals(priority(commonItems), 2510);
 });

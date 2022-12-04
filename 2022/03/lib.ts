@@ -1,30 +1,47 @@
-export function* parse(input: string): IterableIterator<[string, string]> {
+export function* parse(input: string): IterableIterator<string> {
   for (const [line] of input.matchAll(/[a-zA-Z]+/g)) {
-    const length = line.length / 2;
-    yield [line.slice(0, length), line.slice(length)];
+    yield line;
   }
 }
 
-export function intersect(
-  a: Iterable<string>,
-  b: Iterable<string>,
-): Set<string> {
-  const intersection = new Set<string>();
-  const aSet = new Set(a);
-  for (const bItem of b) {
-    if (aSet.has(bItem)) {
-      intersection.add(bItem);
+export function* inCompartments(
+  rucksacks: Iterable<string>,
+): IterableIterator<[string, string]> {
+  for (const items of rucksacks) {
+    const length = items.length / 2;
+    yield [items.slice(0, length), items.slice(length)];
+  }
+}
+
+export function* inElfGroups(
+  rucksacks: Iterable<string>,
+): IterableIterator<[string, string, string]> {
+  let group: string[] = [];
+  for (const items of rucksacks) {
+    group.push(items);
+    if (group.length === 3) {
+      yield group as [string, string, string];
+      group = [];
     }
   }
-  return intersection;
 }
 
-const PRIORITIES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+export function findCommonItem([first, ...rest]: Iterable<string>[]): string {
+  const restSets = rest.map((items) => new Set(items));
+  for (const item of first) {
+    if (restSets.every((set) => set.has(item))) {
+      return item;
+    }
+  }
+  throw Error("No common item found");
+}
+
+const ITEM_TYPES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export function priority(items: Iterable<string>): number {
   let sum = 0;
   for (const item of items) {
-    sum += PRIORITIES.indexOf(item) + 1;
+    sum += ITEM_TYPES.indexOf(item) + 1;
   }
   return sum;
 }
