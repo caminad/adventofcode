@@ -65,3 +65,48 @@ await Deno.writeFile(readme, await p.output());
 p.close();
 
 console.info(`Wrote ${readme}`);
+
+await writeMissing(
+  new URL("lib.ts", readme),
+  `export function* parse(input: string): IterableIterator<string> {
+  for (const [token] of input.matchAll(/\\S+/g)) {
+    yield token;
+  }
+}
+`,
+);
+
+await writeMissing(
+  new URL("test.ts", readme),
+  `import { assertEquals } from "testing/asserts.ts";
+import { parse } from "./lib.ts";
+
+const input = Deno.readTextFileSync(new URL("input.txt", import.meta.url));
+
+Deno.test("parse", () => {
+  assertEquals([...parse("")], []);
+});
+`,
+);
+
+await writeMissing(new URL("input.txt", readme), "");
+
+if (confirm("Show input?")) {
+  await Deno.run({ cmd: ["open", `${url}/input`] }).status();
+}
+
+async function writeMissing(path: URL, data: string): Promise<void> {
+  try {
+    await Deno.stat(path);
+    console.info(`Exists ${path}`);
+    return;
+  } catch (e) {
+    if (e instanceof Deno.errors.NotFound) {
+      // continue
+    } else {
+      throw e;
+    }
+  }
+  await Deno.writeTextFile(path, data);
+  console.info(`Wrote ${path}`);
+}
