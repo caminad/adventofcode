@@ -44,16 +44,22 @@ const readme = new URL(
 );
 await Deno.mkdir(new URL(".", readme), { recursive: true });
 
-const te = new TextEncoder();
-const md = new NodeHtmlMarkdown({ codeBlockStyle: "indented" });
 const p = Deno.run({
   cmd: [Deno.execPath(), "fmt", "--ext=md", "-"],
   stdin: "piped",
   stdout: "piped",
 });
 
-await p.stdin.write(te.encode(md.translate(article.innerHTML)));
-p.stdin.close();
+{
+  const te = new TextEncoder();
+  const md = new NodeHtmlMarkdown({ codeBlockStyle: "indented" });
+  const markdown = md.translate(article.innerHTML)
+    // fix emphasized code like <code><em>...</em></code>
+    .replace(/`_([^`_]+)_`/g, "_`$1`_");
+
+  await p.stdin.write(te.encode(markdown));
+  p.stdin.close();
+}
 
 await Deno.writeFile(readme, await p.output());
 p.close();

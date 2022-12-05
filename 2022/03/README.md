@@ -32,15 +32,15 @@ For example, suppose you have the following list of contents from six rucksacks:
 - The first rucksack contains the items `vJrwpWtwJgWrhcsFMMfFFhFp`, which means
   its first compartment contains the items `vJrwpWtwJgWr`, while the second
   compartment contains the items `hcsFMMfFFhFp`. The only item type that appears
-  in both compartments is lowercase `_p_`.
+  in both compartments is lowercase _`p`_.
 - The second rucksack's compartments contain `jqHRNqRjqzjGDLGL` and
   `rsFMfFZSrLrFZsSL`. The only item type that appears in both compartments is
-  uppercase `_L_`.
+  uppercase _`L`_.
 - The third rucksack's compartments contain `PmmdzqPrV` and `vPwwTWBwg`; the
-  only common item type is uppercase `_P_`.
-- The fourth rucksack's compartments only share item type `_v_`.
-- The fifth rucksack's compartments only share item type `_t_`.
-- The sixth rucksack's compartments only share item type `_s_`.
+  only common item type is uppercase _`P`_.
+- The fourth rucksack's compartments only share item type _`v`_.
+- The fifth rucksack's compartments only share item type _`t`_.
+- The sixth rucksack's compartments only share item type _`s`_.
 
 To help prioritize item rearrangement, every item type can be converted to a
 _priority_:
@@ -50,7 +50,7 @@ _priority_:
 
 In the above example, the priority of the item type that appears in both
 compartments of each rucksack is 16 (`p`), 38 (`L`), 42 (`P`), 22 (`v`), 20
-(`t`), and 19 (`s`); the sum of these is `_157_`.
+(`t`), and 19 (`s`); the sum of these is _`157`_.
 
 Find the item type that appears in both compartments of each rucksack. _What is
 the sum of the priorities of those item types?_

@@ -48,7 +48,7 @@ This strategy guide predicts and recommends the following:
   score of 3 + 3 = _6_.
 
 In this example, if you were to follow the strategy guide, you would get a total
-score of `_15_` (8 + 1 + 6).
+score of _`15`_ (8 + 1 + 6).
 
 _What would your total score be if everything goes exactly according to your
 strategy guide?_

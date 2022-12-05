@@ -47,13 +47,13 @@ with the following list:
 This list represents the Calories of the food carried by five Elves:
 
 - The first Elf is carrying food with `1000`, `2000`, and `3000` Calories, a
-  total of `_6000_` Calories.
-- The second Elf is carrying one food item with `_4000_` Calories.
+  total of _`6000`_ Calories.
+- The second Elf is carrying one food item with _`4000`_ Calories.
 - The third Elf is carrying food with `5000` and `6000` Calories, a total of
-  `_11000_` Calories.
+  _`11000`_ Calories.
 - The fourth Elf is carrying food with `7000`, `8000`, and `9000` Calories, a
-  total of `_24000_` Calories.
-- The fifth Elf is carrying one food item with `_10000_` Calories.
+  total of _`24000`_ Calories.
+- The fifth Elf is carrying one food item with _`10000`_ Calories.
 
 In case the Elves get hungry and need extra snacks, they need to know which Elf
 to ask: they'd like to know how many Calories are being carried by the Elf
