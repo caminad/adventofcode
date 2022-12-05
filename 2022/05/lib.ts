@@ -19,24 +19,17 @@ export function parseStacks(input: string): Stacks {
   const stacks: Stacks = new Map();
 
   for (const [line] of input.matchAll(/.+/g)) {
-    if (/\d/.test(line)) {
-      // " 1   2   3 "
-      break;
-    }
-    for (let i = 1; i < line.length; i += 4) {
-      if (!/[A-Z]/.test(line[i])) {
-        continue;
-      }
+    for (const { 0: label, index } of line.matchAll(/(?<=\[)[A-Z](?=\])/g)) {
       //   1   2   3   4   5
       // "    [A] [B]     [C]"
+      //       ^   ^       ^
       //  0123456789012345678
-      const n = (i + 3) / 4;
+      const n = (index! + 3) / 4;
       let stack = stacks.get(n);
       if (!stack) {
-        stack = [];
-        stacks.set(n, stack);
+        stacks.set(n, stack = []);
       }
-      stack.unshift(line[i]);
+      stack.unshift(label);
     }
   }
 
@@ -52,8 +45,15 @@ export function move(stacks: Stacks, { move, from, to }: Instruction): void {
   }
 }
 
+export function moveAll(stacks: Stacks, { move, from, to }: Instruction): void {
+  const crates = stacks.get(from)?.splice(-move);
+  if (crates) {
+    stacks.get(to)?.push(...crates);
+  }
+}
+
 export function tops(stacks: Stacks): string[] {
   return Array.from(stacks.entries())
-    .sort(([na], [nb]) => na - nb)
+    .sort((a, b) => a[0] - b[0])
     .map(([, stack]) => stack.at(-1) ?? " ");
 }

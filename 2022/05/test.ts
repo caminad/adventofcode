@@ -2,6 +2,7 @@ import { assertEquals } from "testing/asserts.ts";
 import {
   Instruction,
   move,
+  moveAll,
   parseInstructions,
   parseStacks,
   tops,
@@ -93,6 +94,50 @@ Deno.test("move", () => {
   );
 });
 
+Deno.test("moveAll", () => {
+  const stacks = new Map([
+    [1, ["Z", "N"]],
+    [2, ["M", "C", "D"]],
+    [3, ["P"]],
+  ]);
+  moveAll(stacks, { move: 1, from: 2, to: 1 });
+  assertEquals(
+    stacks,
+    new Map([
+      [1, ["Z", "N", "D"]],
+      [2, ["M", "C"]],
+      [3, ["P"]],
+    ]),
+  );
+  moveAll(stacks, { move: 3, from: 1, to: 3 });
+  assertEquals(
+    stacks,
+    new Map([
+      [1, []],
+      [2, ["M", "C"]],
+      [3, ["P", "Z", "N", "D"]],
+    ]),
+  );
+  moveAll(stacks, { move: 2, from: 2, to: 1 });
+  assertEquals(
+    stacks,
+    new Map([
+      [1, ["M", "C"]],
+      [2, []],
+      [3, ["P", "Z", "N", "D"]],
+    ]),
+  );
+  moveAll(stacks, { move: 1, from: 1, to: 2 });
+  assertEquals(
+    stacks,
+    new Map([
+      [1, ["M"]],
+      [2, ["C"]],
+      [3, ["P", "Z", "N", "D"]],
+    ]),
+  );
+});
+
 Deno.test("tops", () => {
   assertEquals(
     tops(
@@ -112,4 +157,12 @@ Deno.test("part 1", () => {
     move(stacks, instruction);
   }
   assertEquals(tops(stacks).join(""), "JCMHLVGMG");
+});
+
+Deno.test("part 1", () => {
+  const stacks = parseStacks(input);
+  for (const instruction of parseInstructions(input)) {
+    moveAll(stacks, instruction);
+  }
+  assertEquals(tops(stacks).join(""), "LVMRWSSPZ");
 });
