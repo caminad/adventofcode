@@ -8,10 +8,15 @@
   },
   "npm": {
     "specifiers": {
+      "@js-temporal/polyfill": "@js-temporal/polyfill@0.4.3",
       "node-html-markdown": "node-html-markdown@1.2.2",
       "node-html-parser": "node-html-parser@6.1.4"
     },
     "packages": {
+      "@js-temporal/polyfill@0.4.3": {
+        "integrity": "sha512-6Fmjo/HlkyVCmJzAPnvtEWlcbQUSRhi8qlN9EtJA/wP7FqXsevLLrlojR44kzNzrRkpf7eDJ+z7b4xQD/Ycypw==",
+        "dependencies": { "jsbi": "jsbi@4.3.0", "tslib": "tslib@2.4.1" }
+      },
       "boolbase@1.0.0": {
         "integrity": "sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==",
         "dependencies": {}
@@ -62,6 +67,10 @@
         "integrity": "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==",
         "dependencies": {}
       },
+      "jsbi@4.3.0": {
+        "integrity": "sha512-SnZNcinB4RIcnEyZqFPdGPVgrg2AcnykiBy0sHVJQKHYeaLUvi3Exj+iaPpLnFVkDPZIV4U0yvgC9/R4uEAZ9g==",
+        "dependencies": {}
+      },
       "node-html-markdown@1.2.2": {
         "integrity": "sha512-VkiTJ2Y9BWscRY0yLm9OYTREvXobmlK7YehdDwIYfDj9VW6MefaFNaQkMTk94U0zyAuCsfLdBsOld54fsNhP9A==",
         "dependencies": { "node-html-parser": "node-html-parser@6.1.4" }
@@ -73,6 +82,10 @@
       "nth-check@2.1.1": {
         "integrity": "sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==",
         "dependencies": { "boolbase": "boolbase@1.0.0" }
+      },
+      "tslib@2.4.1": {
+        "integrity": "sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==",
+        "dependencies": {}
       }
     }
   }
