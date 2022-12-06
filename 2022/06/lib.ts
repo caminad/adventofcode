@@ -1,5 +1,5 @@
-export function findStartOfPacket(input: string): number {
-  return [...input].findIndex((_, i, a) => {
-    return new Set(a.slice(i - 4, i)).size === 4;
+export function findDistinct(input: string, length: number): number {
+  return Array.from(input).findIndex((_, index, chars) => {
+    return new Set(chars.slice(index - length, index)).size === length;
   });
 }
