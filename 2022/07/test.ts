@@ -140,11 +140,25 @@ Deno.test("sizes", () => {
 
 Deno.test("part 1", () => {
   const dir = run(parse(input));
-  let total = 0;
+  let smallTotal = 0;
   for (const entry of sizes([], dir)) {
     if (entry.type === "dir" && entry.size <= 100_000) {
-      total += entry.size;
+      smallTotal += entry.size;
     }
   }
-  assertEquals(total, 1084134);
+  assertEquals(smallTotal, 1084134);
+});
+
+Deno.test("part 2", () => {
+  const total = 70_000_000;
+  const required = 30_000_000;
+  const root = run(parse(input));
+  const dirsAscending = Array.from(sizes([], root))
+    .filter((x) => x.type === "dir")
+    .sort((a, b) => a.size - b.size);
+  const rootSize = dirsAscending.at(-1)!.size;
+  const unused = total - rootSize;
+  const needed = required - unused;
+  const dir = dirsAscending.find((x) => x.size >= needed)!;
+  assertEquals(dir.size, 6183184);
 });
