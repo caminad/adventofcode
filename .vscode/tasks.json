@@ -3,40 +3,14 @@
   "tasks": [
     {
       "type": "deno",
-      "command": "test",
-      "args": [
-        "--allow-all",
-        "--coverage=.coverage"
-      ],
-      "problemMatcher": [
-        "$deno-test"
-      ],
-      "group": "test",
-      "label": "deno: test"
-    },
-    {
-      "type": "deno",
-      "command": "coverage",
-      "args": [
-        ".coverage"
-      ],
-      "problemMatcher": [
-        "$deno-test"
-      ],
-      "group": "none",
-      "label": "deno: coverage"
-    },
-    {
-      "type": "cargo",
-      "subcommand": "test",
-      "problemMatcher": [
-        "$rustc"
-      ],
+      "command": "task",
+      "args": ["new"],
+      "problemMatcher": ["$deno"],
+      "label": "deno task: new",
       "group": {
-        "kind": "test",
+        "kind": "build",
         "isDefault": true
-      },
-      "label": "Rust: cargo test - adventofcode"
+      }
     }
   ]
 }
