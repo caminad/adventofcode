@@ -71,12 +71,11 @@ const createFile = (dir: URL, name: string): (template: {
   return async (template, ...substitutions): Promise<void> => {
     const data = String.raw(template, ...substitutions).trimStart();
     try {
-      await Deno.stat(path);
-      console.info(`Exists ${path}`);
+      await Deno.writeTextFile(path, data, { createNew: true });
+      console.info(`Wrote ${path}`);
     } catch (e) {
-      if (e instanceof Deno.errors.NotFound) {
-        await Deno.writeTextFile(path, data);
-        console.info(`Wrote ${path}`);
+      if (e instanceof Deno.errors.AlreadyExists) {
+        console.info(`Exists ${path}`);
       } else {
         throw e;
       }
