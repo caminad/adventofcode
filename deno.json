@@ -1,6 +1,6 @@
 {
   "importMap": "import_map.json",
   "tasks": {
-    "new": "deno run --allow-read --allow-write --allow-run --allow-net=adventofcode.com --allow-env=LOG_PERF scripts/new.ts"
+    "fetch": "deno run --allow-read --allow-write --allow-run --allow-net=adventofcode.com --allow-env=LOG_PERF scripts/fetch.ts"
   }
 }

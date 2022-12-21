@@ -4,9 +4,9 @@
     {
       "type": "deno",
       "command": "task",
-      "args": ["new"],
+      "args": ["fetch"],
       "problemMatcher": ["$deno"],
-      "label": "deno task: new",
+      "label": "deno task: fetch",
       "group": {
         "kind": "build",
         "isDefault": true
