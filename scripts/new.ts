@@ -32,7 +32,13 @@ const article = parse(await res.text()).querySelector("article")!;
 
 for (const link of article.querySelectorAll("a")) {
   const href = link.getAttribute("href");
-  if (href?.startsWith("/")) {
+  if (!href) {
+    continue;
+  }
+  if (/^\d+$/.test(href)) {
+    link.setAttribute("href", `../${href.padStart(2, "0")}/README.md`);
+  }
+  if (href.startsWith("/")) {
     link.setAttribute("href", new URL(href, res.url).href);
   }
 }
