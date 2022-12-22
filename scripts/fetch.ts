@@ -1,3 +1,4 @@
+import "https://deno.land/std@0.170.0/dotenv/load.ts";
 import { Temporal } from "npm:@js-temporal/polyfill";
 import { NodeHtmlMarkdown } from "npm:node-html-markdown";
 import { parse } from "npm:node-html-parser";
@@ -11,7 +12,11 @@ const day = Deno.args.at(0) ??
 const year = Deno.args.at(1) ??
   (now.month < 12 ? now.year - 1 : now.year).toString();
 
-const res = await fetch(`https://adventofcode.com/${year}/day/${day}`);
+const cookie = Deno.env.get("AOC_COOKIE") ?? prompt("cookie") ?? "";
+
+const res = await fetch(`https://adventofcode.com/${year}/day/${day}`, {
+  headers: { cookie },
+});
 
 if (!res.ok) {
   throw Error(`Failed to fetch ${res.url}: ${res.status} ${res.statusText}`);
@@ -19,18 +24,28 @@ if (!res.ok) {
 
 console.info(`Fetched ${res.url}`);
 
-const article = parse(await res.text()).querySelector("article")!;
-
+const container = parse("<main></main>");
 {
-  const title = article.querySelector("h2")!;
+  const document = parse(await res.text());
+  for (const desc of document.querySelectorAll(".day-desc")) {
+    container.appendChild(desc);
+  }
+
+  const title = container.querySelector("h2")!;
   title.tagName = "h1";
   title.innerHTML = title.innerHTML
     .replaceAll("---", "")
     .replace(/Day \d+/, `<a href="${res.url}">Day ${day}</a>`)
     .trim();
+
+  const part2 = container.querySelector("#part2");
+  if (part2) {
+    part2.tagName = "hr";
+    part2.textContent = "";
+  }
 }
 
-for (const link of article.querySelectorAll("a")) {
+for (const link of container.querySelectorAll("a")) {
   const href = link.getAttribute("href");
   if (!href) {
     continue;
@@ -57,7 +72,7 @@ await Deno.mkdir(dir, { recursive: true });
 
   const te = new TextEncoder();
   const nhm = new NodeHtmlMarkdown({ codeBlockStyle: "indented" });
-  const md = nhm.translate(article.innerHTML)
+  const md = nhm.translate(container.innerHTML)
     // fix emphasized code like <code><em>...</em></code>
     .replace(/`_([^`_]+)_`/g, "_`$1`_");
 
@@ -68,6 +83,19 @@ await Deno.mkdir(dir, { recursive: true });
   p.close();
 
   console.info(`Wrote ${readme}`);
+}
+
+{
+  const input = new URL("input.txt", dir);
+
+  const inputRes = await fetch(`${res.url}/input`, {
+    headers: { cookie },
+  });
+  if (inputRes.ok) {
+    await Deno.writeTextFile(input, await inputRes.text());
+
+    console.info(`Wrote ${input}`);
+  }
 }
 
 const createFile = (dir: URL, name: string): (template: {
@@ -107,9 +135,3 @@ Deno.test("parse", () => {
   assertEquals([...parse("")], []);
 });
 `;
-
-await createFile(dir, "input.txt")``;
-
-if (confirm("Show input?")) {
-  await Deno.run({ cmd: ["open", `${res.url}/input`] }).status();
-}
